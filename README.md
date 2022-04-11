@@ -1,0 +1,1 @@
+# scripts-osu-maping
