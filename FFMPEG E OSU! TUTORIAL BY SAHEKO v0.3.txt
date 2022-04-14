@@ -1,0 +1,568 @@
+------------------------------------------
+INDICE
+------------------------------------------
+	FFMPEG OSU! COMMANDS TUTORIAL
+		Links
+		Convenções
+		CMD - como abrir
+		CMD - como usar "CD"
+	FFMPEG AND OSU!
+		analisar
+		encodar
+		analisar
+			encodar
+		offset video
+	VIDEO
+		comandos
+	AUDIO
+		comandos
+	EXPLICANDO O QUE É CADA COISA
+		outros relevantes
+	PORQUE USAR ESSA MERDA
+		texto
+	EXEMPLOS
+		exemplos diversos video mp3 dvdrip
+	REFERENCIAS
+		links
+
+------------------------------------------
+---------------------
+FFMPEG OSU! COMMANDS TUTORIAL
+---------------------
+Convenções:
+	"PATH_FFMPEG" = completar com o caminho do ffmpeg
+	"PATH" = completar com o caminho do arquivo a ser usado
+	"input.format" = completar com o nome e o formato do aquivo
+	"X" = valor
+---------------------
+---------------------
+O FFmpeg é utilizado diretamente na linha de comando! Exemplo de como abrir o CMD (windows 10):
+	(windows button) + R > Digite "cmd" > Pressione "ok"
+
+Com o CMD aberto é preciso colocalo direcionado a pasta que contem o FFmpeg:
+	cd /
+	cd "PATH_FFMPG"
+
+( "cd /" é nescessario para utilizar o ffmpeg em outras unidades de memoria).
+---------------------
+FFMPEG AND OSU!
+---------------------
+
+1 - Analisar fontes e coletar informaçoes relevantes como: framerate, resolução, bitrates, codecs.
+	MediaInfo, Bitrate Viewer, Spek
+
+2 - Encodar como (Audio encode quality ".mp3") e (video encode quality 720p no audio ".flv") -> (comandos disponiveis abaixo, copiar e colar subistituindo o necessário)
+
+2.1 - Analisar resultados e coletar as informaçoes novamente! principalmente filesize e bitrate e se necessario por ter um tamanho muito grande ou talvez um pico de bitrate,
+reencode ajustando os parametros de: "-crf X", "-maxrate Xk"e "-bufsize Xk" em (video encode quality 720p bitrate no audio ".flv") tenha em mente que:
+	osu! folder filesize -> 5mb + 10mb/min
+	calculadora bitrate aproximidado por filesize -> https://www.dr-lex.be/info-stuff/videocalc.html
+	crf x +6 = bitrate_medio*1/2 | crf x -6 = bitrate_medio*2 
+	maxrate <= buffsize <= 2*maxrate
+
+3 - calcular offset_video, adicine o mp3 gerado ao osu! e obtenha o offset desse
+	offset_video = offset_mp3_oficial - offset_mp3_video +-5 
+
+---------------------
+---------------------
+VIDEO
+---------------------  
+
+video no encode no audio
+ffmpeg -i "Path\input.format" -an -c:v copy -map 0:0 -map_metadata -1 "Path\output.format"
+
+video encode no audio ".flv"
+ffmpeg -i "Path\input.format" -an -c:v libx264 -preset ultrafast -crf 0 -pix_fmt yuv420p -map 0:0 -map_metadata -1 "Path\output.flv"
+
+video encode quality 720p no audio ".flv"
+ffmpeg -i "Path\input.format" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "Path\output.flv"
+
+video encode quality 720p bitrate no audio ".flv"
+ffmpeg -i "Path\input.format" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -maxrate 1333k -bufsize 2666k -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "Path\output.flv"
+
+---------------------
+AUDIO
+---------------------
+
+audio no encode
+ffmpeg -i "Path\input.format" -vn -c:a copy -map 0:0 -map_metadata -1 "Path\output.format"
+
+audio encode ".flac"
+ffmpeg -i "Path\input.format" -vn -c:a flac -map 0:0 -map_metadata -1 "Path\output.flac"
+
+audio encode ".mp3"
+ffmpeg -i "Path\input.format" -vn -c:a libmp3lame -joint_stereo 0 -map 0:0 -map_metadata -1 "Path\output.mp3"
+ 
+audio encode quality ".mp3" 
+ffmpeg -i "Path\input.format" -vn -c:a libmp3lame -joint_stereo 0 -map 0:0 -map_metadata -1 "Path\output.mp3"
+
+audio encode ".ogg"
+ffmpeg -i "Path\input.format" -vn -c:a libvorbis -map 0:0 -map_metadata -1 "Path\output.ogg"
+
+audio encode quality ".ogg"
+ffmpeg -i "Path\input.format" -vn -c:a libvorbis -q 10 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "Path\output.ogg"
+
+folder audio encode quality ".ogg"
+cd "PATH"
+FOR /F "tokens=*" %G IN ('dir /b *.format') DO PATH_FFMPG\ffmpeg -i "%G" -c:a libvorbis -q 10 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "%~nG.ogg"
+
+
+folder audio encode quality ".ogg"
+cd "PATH"
+FOR /F "tokens=*" %G IN ('dir /b *.format') DO PATH_FFMPG\ffmpeg -i "%G" -filter:a volumedetect -f null /dev/null
+
+C:\Users\conde\AppData\Local\osu!\Songs\Lie and a Chameleon - Saredo Kijutsushi Wa Saio Furu
+C:\Users\conde\Desktop\MAPPING\ffmpeg-4.1.3-win64-static
+FOR /F "tokens=*" %G IN ('dir /b *.wav') DO C:\Users\conde\Desktop\MAPPING\ffmpeg-4.1.3-win64-static\ffmpeg -i "%G" -filter:a volumedetect -f null /dev/null
+
+C:\Users\conde\AppData\Local\osu!\Songs\Lie and a Chameleon - Saredo Kijutsushi Wa Saio Furu\Nova pasta\
+
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\Lie and a Chameleon - Saredo Kijutsushi Wa Saio Furu\Nova pasta\soft-hitfinish.wav" -filter:a "volume=0.7dB" "C:\Users\conde\AppData\Local\osu!\Songs\Lie and a Chameleon - Saredo Kijutsushi Wa Saio Furu\Nova pasta\soft-hitfinish fix.wav"
+
+
+ffmpeg -i "Path\input.format" -vn -c:a pcm_s16le -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "Path\output.wav"
+
+cd C:\Users\conde\AppData\Local\osu!\Songs\Lie and a Chameleon - Saredo Kijutsushi Wa Saio Furu
+FOR /F "tokens=*" %G IN ('dir /b *.*') DO C:\Users\conde\Desktop\MAPPING\ffmpeg-4.1.3-win64-static\ffmpeg -i "%G" -c:a libvorbis -q 10 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\Lie and a Chameleon - Saredo Kijutsushi Wa Saio Furu\NEW\%~nG.ogg"
+
+
+ogg quall 9 = 320 
+ogg quall 6 = 192
+
+---------------------
+---------------------
+EXPLICANDO O QUE É CADA COISA
+---------------------
+ffmpeg -i "Path\input.format" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -maxrate 1333k -bufsize 2666k -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "Path\output.flv"
+ffmpeg -i "Path\input.format" -vn -c:a libvorbis -q 10 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "Path\output.ogg"
+
+ffmpeg -> chamar o ffmpeg
+-i "Path\input.format" -> seleciona o arquivo fonte
+-an -> impede a adição de stream de audio
+-c:v libx264 -> seleciona o codec de video, "libx264" é o codec para osu!
+-s 1280x720 -> resolução, 1280x720 é o maximo permitido
+-r 23.976 -> framerate aka fps do video
+-preset veryslow -> a forma com que o ffmpeg trabalha em cada frame, "compressão"
+-crf 23 -> coeficiente de qualidade constante, 0 a 51 onde 0 é a melhor qualidade e 51 a pior, 23 é o padrão 
+-maxrate 1333k -bufsize 2666k -> "maxrate" é a regra de valor maximo que de bitrate, "bufsize" é a definiçao de quantos dados vão ser escritos antes da regra de maxrate ser verificada(confuso mas é isso)
+-profile:v high -> perfil de qualidade, apenas prevenção 
+-pix_fmt yuv420p -> perfil de organizaçao do formato de cores , apenas prevenção 
+-map 0:0 -> muitos arquivos tem informaçoes diferentes dentro dele mesmo como legendas, capa do album, metadata. Essa opção seleciona qual "stream" será usada
+-map_metadata -1 -> remover qualquer tipo de metadata 
+"Path\output.flv" -> arquivo de saida, onde vai ser salvo
+
+-vn -> impede a adição de stream de video
+-c:a libvorbis -> codec de audio a ser usado
+-q 10 -> coeficiente de qualidade
+-ac 2 -> numero de canais
+-ar 44100 -> Sampling rate
+
+---------------------
+Outras opções relevantes
+
+-ss 00:00:00.00 -to 00:00:00.00 -> CORTAR HH:MM:SS.MS	
+-minrate X -> regra de minimo de bitrate (bugado)
+
+---------------------
+
+---------------------
+---------------------
+Exemplos
+---------------------
+video tarrasky onegai cindelea 
+
+video
+ffmpeg -i "C:\Users\conde\Desktop\onegai cindelea\FONTE.mkv" -ss 00:00:03.49 -to 00:02:14.11 -map 0:0 -map_metadata -1 -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -pix_fmt yuv420p -an "C:\Users\conde\Desktop\onegai cindelea\output crf 23.flv"
+video qualidade
+ffmpeg -i "C:\Users\conde\Desktop\onegai cindelea\FONTE.mkv" -ss 00:00:03.48 -to 00:02:14.11 -map 0:0 -map_metadata -1 -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -maxrate -1000 -bufsize 1000 pix_fmt yuv420p -an "C:\Users\conde\Desktop\onegai cindelea\output xx.flv"
+mp3
+ffmpeg -i "C:\Users\conde\Desktop\onegai cindelea\FONTE.mkv" -ss 00:00:03.48 -to 00:02:14.11 -map 0:1 -map_metadata -1 -vn -c:a libmp3lame -joint_stereo 0 "C:\Users\conde\Desktop\onegai cindelea\audio_offset.mp3"
+
+---------- 
+dvdrip e converter beazinha027 scarlet
+
+juntar arquivos
+cat D:\VIDEO_TS\*.VOB > C:\Users\conde\Desktop\output_CATEEEEE.vob
+(cat é um comando interno do linux convertido ao windows)
+
+converter uniao losyless
+ffmpeg -async 1 -analyzeduration 100M -probesize 100M -i "C:\Users\conde\Desktop\BEA SCRALET\output_CATEEEEE.vob" -map 0:1 -map 0:3 -map_metadata -1 -c:v libx264 -s 720x480 -r 29.976 crf=0 -preset ultrafast -profile:v high444 -pix_fmt yuv420p -c:a flac "C:\Users\conde\Desktop\output converção.mkv"
+
+cortar encodar video
+ffmpeg -i "C:\Users\conde\Desktop\BEA SCRALET\output converção.mkv" -ss 00:27:40.06 -to 00:29:19.06 -map 0:0 -map_metadata -1 -c:v libx264 -s 720x480 -r 29.976 -preset veryslow -crf 23 -profile:v high -pix_fmt yuv420p -an "C:\Users\conde\Desktop\BEA SCRALET\output crf 23.flv"
+
+cortar e encodar audio
+ffmpeg -i "C:\Users\conde\Desktop\BEA SCRALET\output converção.mkv" -ss 00:27:40.06 -to 00:29:19.06 -map 0:1 -map_metadata -1 -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 "C:\Users\conde\Desktop\BEA SCRALET\output audio offset.mp3"
+
+-------
+mp3 tarrasky Fascinate
+
+ffmpeg -i "C:\Users\conde\Downloads\THE iDOLM@STER Cinderella Girls Starlight Stage Game Songs\2022. Fascinate.mp3" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Downloads\THE iDOLM@STER Cinderella Girls Starlight Stage Game Songs\2022. Fascinate 192 pog.mp3"
+
+-------
+mp3 rob vocaloid
+ffmpeg -i "C:\Users\conde\Desktop\VOCAROCK-F\01 天ノ弱.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\VOCAROCK-F\01 天ノ弱.mp3"
+
+-------
+video teste reencode high 
+ffmpeg -i "C:\Users\conde\Downloads\[HorribleSubs] Tower of God - 06 [1080p].mkv" -c:v libx264 -s 1920x1080 -r 23.976 -preset veryslow -crf 23 -profile:v high -pix_fmt yuv420p -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map 0:1 -map_metadata -1 "C:\Users\conde\Downloads\output 01.flv"
+	1.3 gb -> 240 mb 1080p 23min
+
+-------
+mp3 ~ jet
+ffmpeg -i "C:\Users\conde\Desktop\Polkadot Stingray - Jet (FLAC 16 Bits)\02. Jet (Instrumental).flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\Polkadot Stingray - Jet (FLAC 16 Bits)\01. Jet INSTRU ENTAL.mp3"
+
+
+ffmpeg -i "C:\Users\conde\Desktop\mapas\MEU\NANATSU\[Nemuri] Amamiya Sora 雨宮天 (2014-2020) [FLAC]\[2019.11.06] 雨宮天｜Regeneration\03. Regeneration [instrumental].flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\mapas\MEU\NANATSU\[Nemuri] Amamiya Sora 雨宮天 (2014-2020) [FLAC]\[2019.11.06] 雨宮天｜Regeneration\regeneration remake instrumental.mp3"
+ffmpeg -i "C:\Users\conde\Desktop\mapas\MEU\NANATSU\[Nemuri] Amamiya Sora 雨宮天 (2014-2020) [FLAC]\[2019.11.06] 雨宮天｜Regeneration\01. Regeneration.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\mapas\MEU\NANATSU\[Nemuri] Amamiya Sora 雨宮天 (2014-2020) [FLAC]\[2019.11.06] 雨宮天｜Regeneration\regeneration remake.mp3"
+
+
+ffmpeg -i "C:\Users\conde\Desktop\mapas\MEU\NANATSU\[Nemuri] Amamiya Sora 雨宮天 (2014-2020) [FLAC]\videoplayback.mp4" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\mapas\MEU\NANATSU\[Nemuri] Amamiya Sora 雨宮天 (2014-2020) [FLAC]\output.flv"
+
+
+ffmpeg -i "C:\Users\conde\Desktop\ANIME\TOWER\07 - Naraku no Hana.mp3" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\ANIME\TOWER\Naraku no Hana amazing.mp3"
+
+---------------------
+Higurashi no Naku Koro ni Kai NCOP.mkv
+
+video
+ffmpeg -i "C:\Users\conde\Downloads\Higurashi no Naku Koro ni Kai NCOP.mkv" -vf trim=start=6 -an -c:v libx264 -s 716x360 -r 23.976 -preset veryslow -crf 23 -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Downloads\Higurashi no Naku Koro ni Kai NCOP simple cut.flv"
+audio
+ffmpeg -i "C:\Users\conde\Downloads\Higurashi no Naku Koro ni Kai NCOP.mkv" -vn -c:a flac -map 0:0 -map_metadata -1 "C:\Users\conde\Downloads\Higurashi no Naku Koro ni Kai NCOP.flac"
+ffmpeg -i "C:\Users\conde\Downloads\Higurashi no Naku Koro ni Kai NCOP.flac" -filter:a volumedetect -f null /dev/null
+ffmpeg -i "C:\Users\conde\Downloads\Higurashi no Naku Koro ni Kai NCOP.mkv" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map_metadata -1 -filter:a "volume=11.5dB" "C:\Users\conde\Downloads\Higurashi no Naku Koro ni Kai NCOP NORMALIZED  cut.mp3"
+
+
+
+hs full yaya
+
+ffmpeg -i "C:\Users\conde\Downloads\MAPA NOVO\Higurashi no Naku Koro ni + CDs [RAW-Creditless][OP.ED][BDRemux]\02.Higurashi no Naku Koro ni Kai [RAW][BDRemux]\CDs\Opening Single\Higurashi 2 - Opening Single.wav" -ss 00:09:40.22 -to 00:14:40.25 -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Downloads\MAPA NOVO\Higurashi no Naku Koro ni + CDs [RAW-Creditless][OP.ED][BDRemux]\02.Higurashi no Naku Koro ni Kai [RAW][BDRemux]\CDs\Opening Single\output.mp3"
+
+
+ffmpeg -i "C:\Users\conde\Desktop\nopulodogatodnv.flac" -filter:a volumedetect -f null /dev/null
+ffmpeg -i "C:\Users\conde\Desktop\nopulodogatodnv.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map_metadata -1 -filter:a "volume=0.1dB" "C:\Users\conde\Desktop\nopulodogatodnv.mp3"
+ffmpeg -i "C:\Users\conde\Desktop\nopulodogatodnv.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map_metadata -1 -filter:a "volume=0.1dB" "C:\Users\conde\Desktop\nopulodogatodnv320.mp3"
+
+
+ffmpeg -i "C:\Users\conde\Downloads\Nova pasta\output.mp3" -ss 00:00:00.00 -to 00:00:50.00 -filter:a volumedetect -f null /dev/null
+---------------------
+
+ffmpeg -i "C:\Users\conde\Desktop\[Album] 嘘とカメレオン - 予想は嘘よ [AAC]\01 されど奇術師は賽を振る.m4a" -filter:a volumedetect -f null /dev/null
+
+ffmpeg -i "C:\Users\conde\Desktop\[Album] 嘘とカメレオン - 予想は嘘よ [AAC]\01 されど奇術師は賽を振る.m4a" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map_metadata -1 -filter:a "volume=0.1dB" "C:\Users\conde\Desktop\[Album] 嘘とカメレオン - 予想は嘘よ [AAC]\01 されど奇術師は賽を振る.mp3"
+
+
+
+-------------------
+
+ffmpeg -i "C:\Users\conde\Downloads\Nova pasta (2)\11 Eleventh Hour.mp3" -filter:a volumedetect -f null /dev/null
+
+ffmpeg -i "C:\Users\conde\Downloads\Nova pasta (2)\11 Eleventh Hour.mp3" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map_metadata -1 -filter:a "volume=1.1dB" "C:\Users\conde\Downloads\Nova pasta (2)\11 Eleventh Hour 192.mp3"
+ffmpeg -i "C:\Users\conde\Downloads\Nova pasta (2)\11 Eleventh Hour.mp3" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 320k -joint_stereo 0 -map_metadata -1 -filter:a "volume=1.1dB" "C:\Users\conde\Downloads\Nova pasta (2)\11 Eleventh Hour 320.mp3"
+
+-------------------
+
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\1190035 Eiko Shimamiya - Naraku no Hana (TV Size)\soft-hitwhistle.wav" -filter:a volumedetect -f null /dev/null
+
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\1190035 Eiko Shimamiya - Naraku no Hana (TV Size)\soft-hitwhistle.wav" -filter:a "volume=4.4dB" "C:\Users\conde\AppData\Local\osu!\Songs\1190035 Eiko Shimamiya - Naraku no Hana (TV Size)\soft-hitwhistle fix.wav"
+
+---------------------
+dororo
+
+
+video pog
+ffmpeg -i "C:\Users\conde\Downloads\[Moozzi2] Dororo BD-BOX - TV + Music Collection + SP\EXTRA\[Moozzi2] Dororo [SP02] NCED - 02 [ S2 ] (BD 1920x1080 x.264 Flac).mkv" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Downloads\[Moozzi2] Dororo BD-BOX - TV + Music Collection + SP\EXTRA\video.flv"
+video pog mais config
+ffmpeg -i "C:\Users\conde\Downloads\[Moozzi2] Dororo BD-BOX - TV + Music Collection + SP\EXTRA\[Moozzi2] Dororo [SP02] NCED - 02 [ S2 ] (BD 1920x1080 x.264 Flac).mkv" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 14 -maxrate 1333k -bufsize 2666k -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Downloads\[Moozzi2] Dororo BD-BOX - TV + Music Collection + SP\EXTRA\video 2666 1333 14.flv"
+
+
+C:\Users\conde\AppData\Local\osu!\Songs\eve - Yamiyo (TV Size)\
+
+audio analise
+ffmpeg -i "C:\Users\conde\Downloads\[Moozzi2] Dororo BD-BOX - TV + Music Collection + SP\EXTRA\[Moozzi2] Dororo [SP02] NCED - 02 [ S2 ] (BD 1920x1080 x.264 Flac).mkv" -vn -c:a flac -map 0:0 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\eve - Yamiyo (TV Size)\output.flac"
+audio is pog
+ffmpeg -i "C:\Users\conde\Downloads\[Moozzi2] Dororo BD-BOX - TV + Music Collection + SP\EXTRA\[Moozzi2] Dororo [SP02] NCED - 02 [ S2 ] (BD 1920x1080 x.264 Flac).mkv" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:1 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\eve - Yamiyo (TV Size)\output 320.mp3"
+
+applause
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\eve - Yamiyo (TV Size)\16.Hayate.flac" -vn -c:a libvorbis -q 10 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\eve - Yamiyo (TV Size)\output.ogg"
+
+
+
+---------------------
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\1102615 Chitaozinho e Xororo - Evidencias (Lofi Remix)\Nova pasta\evidencias LOFI.wav" -filter:a volumedetect -f null /dev/null
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\1102615 Chitaozinho e Xororo - Evidencias (Lofi Remix)\Nova pasta\evidencias.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\1102615 Chitaozinho e Xororo - Evidencias (Lofi Remix)\Nova pasta\evidencias.mp3"
+
+
+
+---------------------
+
+
+
+
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\1102615 Chitaozinho e Xororo - Evidencias (Lofi Remix)\Chitãozinho e Xororó - Evidências (Lofi Remix).mp4" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 29 -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\1102615 Chitaozinho e Xororo - Evidencias (Lofi Remix)\Chitãozinho e Xororó - Evidências (Lofi Remix).flv"
+
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\1102615 Chitaozinho e Xororo - Evidencias (Lofi Remix)\Chitãozinho e Xororó - Evidências (Lofi Remix).mp4" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\1102615 Chitaozinho e Xororo - Evidencias (Lofi Remix)\Chitãozinho e Xororó - Evidências (Lofi Remix).mp3"
+---------------------
+polkadot stingray free
+
+ffmpeg -i "Path\input.format" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "Path\output.ogg"
+ffmpeg -i X -filter:a volumedetect -f null /dev/null
+
+
+"C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\output."
+"C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\02. FREE (Instrumental) 「ost.jpoplibs.us」.flac"
+"C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac"
+
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\02. FREE (Instrumental) 「ost.jpoplibs.us」.flac" -filter:a volumedetect -f null /dev/null
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac" -filter:a volumedetect -f null /dev/null
+
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\02. FREE (Instrumental) 「ost.jpoplibs.us」.flac" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\output 9 inst.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\02. FREE (Instrumental) 「ost.jpoplibs.us」.flac" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\output 6 inst.ogg"
+
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\output 6.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\output 9.ogg"
+
+
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\porra.mp3"
+
+
+
+
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac" -ss 00:01:43.226 -to 00:01:48.680 -filter:a volumedetect -f null /dev/null
+
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac" -filter:a drmeter -length 1.182 -f null /dev/null
+
+ffmpeg -i "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\01. FREE 「ost.jpoplibs.us」.flac" -vn -c:a pcm_s16le -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\POLKADOT STINGRAY - FREE flac\FODA.wav"
+
+
+
+1.182
+00:00:02:318
+00:00:01:182
+00:00:00:500
+
+---------------------
+
+
+
+ffmpeg -i "Path\input.format" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "Path\output.ogg"
+ffmpeg -i X -filter:a volumedetect -f null /dev/null
+
+C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\05. Lemonade.flac
+Mili - Lemonade.mp4
+
+ffmpeg -i "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\05. Lemonade.flac" -filter:a volumedetect -f null /dev/null
+ffmpeg -i "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\05. Lemonade.flac" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\output 6.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\05. Lemonade.flac" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\output 9.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\05. Lemonade.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 320k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\output 320.mp3"
+
+ffmpeg -i "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\Mili - Lemonade.mp4" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 320k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\[2018] M M [M]\[2018] Millennium Mother [Mili]\bad.mp3"
+
+146 - 3655
+
+
+offset_video = -3.509
+
+offset_video = offset_mp3_oficial - offset_mp3_video +-5
+
+
+ ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\beatmap-637322382129782646-output 320\Lemonade9.ogg" -ss 00:00:34.431 -to 00:00:51.574 -filter:a volumedetect -f null /dev/null
+
+
+
+
+-ss 00:00:34.431 -to 00:00:51.574
+
+C:\Users\conde\AppData\Local\osu!\Songs\beatmap-637322382129782646-output 320
+
+cd "PATH"
+FOR /F "tokens=*" %G IN ('dir /b *.format') DO PATH_FFMPG\ffmpeg -i "%G" -filter:a volumedetect -f null /dev/null
+
+
+cd "C:\Users\conde\AppData\Local\osu!\Songs\Mili - Lemonade"
+FOR /F "tokens=*" %G IN ('dir /b *.wav') DO C:\Users\conde\Desktop\MAPPING\ffmpeg-4.1.3-win64-static\bin\ffmpeg -i "%G" -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "%~nG.ogg"
+
+
+
+
+
+
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\Mili - Lemonade\Lemonade Mili [Music Box].mkv" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\Mili - Lemonade\aplaysee.ogg"
+ffmpeg -i "C:\Users\conde\AppData\Local\osu!\Songs\Mili - Lemonade\awa.mkv" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map_metadata -1 "C:\Users\conde\AppData\Local\osu!\Songs\Mili - Lemonade\aplaysee.ogg"
+---------------------
+EDU MP3 VIDEO FODA
+
+
+C:\Users\conde\Desktop
+MAKKENZ x arai tasuku - ヤマを横切る白雲のように人には分からないように私に笑いかけて-RiXO4TyvcQ4.webm
+
+ffmpeg -i "C:\Users\conde\Desktop\MAKKENZ x arai tasuku - ヤマを横切る白雲のように人には分からないように私に笑いかけて-RiXO4TyvcQ4.webm" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\pog.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\MAKKENZ x arai tasuku - ヤマを横切る白雲のように人には分からないように私に笑いかけて-RiXO4TyvcQ4.webm" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\pog 320.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\MAKKENZ x arai tasuku - ヤマを横切る白雲のように人には分からないように私に笑いかけて-RiXO4TyvcQ4.webm" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 320k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\pog.mp3"
+ffmpeg -i "C:\Users\conde\Desktop\MAKKENZ x arai tasuku - ヤマを横切る白雲のように人には分からないように私に笑いかけて-RiXO4TyvcQ4.webm" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\pog.mp3"
+
+
+C:\Users\conde\Desktop
+source.mkv
+
+ffmpeg -i "C:\Users\conde\Desktop\source.mkv" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\output 23 puro.flv"
+ffmpeg -i "C:\Users\conde\Desktop\source.mkv" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -maxrate 1333k -bufsize 2666k -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\output 23 1333 2666.flv"
+
+
+ffmpeg -i "C:\Users\conde\Desktop\source.mkv" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map_metadata -1 "C:\Users\conde\Desktop\output video.ogg"
+---------------------
+SZAYURI MAPA NINJA
+
+C:\Users\conde\Desktop\SAYURI\01.summer bug.mp3
+
+
+ffmpeg -i X -filter:a volumedetect -f null /dev/null
+ffmpeg -i "Path\input.format" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "Path\output.ogg"
+ffmpeg -i "path\05. Lemonade.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 320k -joint_stereo 0 -map 0:0 -map_metadata -1 "path\output 320.mp3"
+
+ffmpeg -i "C:\Users\conde\Desktop\SAYURI\01.summer bug.mp3" -filter:a volumedetect -f null /dev/null
+0 -8.2
+
+ffmpeg -i "C:\Users\conde\Desktop\SAYURI\01.summer bug.mp3" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SAYURI\output 6.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\SAYURI\01.summer bug.mp3" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SAYURI\output 9.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\SAYURI\01.summer bug.mp3" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SAYURI\output 192.mp3"
+
+
+
+-----------------------------------
+potage remake audio
+C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]
+01 A potage.flac
+
+C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\01 A potage.flac
+
+
+ffmpeg -i "C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\01 A potage.flac" -filter:a volumedetect -f null /dev/null
+-0.1 -10
+-filter:a "volume=0.1dB"
+
+100 60
+x   50.1
+
+83.5 vol medio
+
+
+
+ffmpeg -i "C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\01 A potage.flac" -vn -filter:a "volume=0.1dB" -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\output 6.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\01 A potage.flac" -vn -filter:a "volume=0.1dB" -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\output 9.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\01 A potage.flac" -vn -filter:a "volume=0.1dB" -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\mapas\MEU\tricot - potage On the boom - [FLAC]\output 192.mp3"
+
+---------------------
+sora tob sakana
+
+
+C:\Users\conde\Desktop\sora tob sakana\font.flac
+
+-11.9
+
+ffmpeg -i "C:\Users\conde\Desktop\sora tob sakana\font.flac" -filter:a volumedetect -f null /dev/null
+ffmpeg -i "C:\Users\conde\Desktop\sora tob sakana\font.flac" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\sora tob sakana\output 6.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\sora tob sakana\font.flac" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\sora tob sakana\output 9.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\sora tob sakana\font.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\sora tob sakana\output 192.mp3"
+
+---------------------
+carburador queimado 
+C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES
+Cheiro de somebody that i used to know.wav
+
+C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\Cheiro de somebody that i used to know.wav
+
+
+-13.7
+
+
+
+ffmpeg -i "C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\Cheiro de somebody that i used to know.wav" -filter:a volumedetect -f null /dev/null
+ffmpeg -i "C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\Cheiro de somebody that i used to know.wav" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\output 6.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\Cheiro de somebody that i used to know.wav" -vn -c:a libvorbis -q 9 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\output 9.ogg"
+ffmpeg -i "C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\Cheiro de somebody that i used to know.wav" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SOMEBODDY THAT I SYUDES\output 192.mp3"
+
+
+-------------------
+santa claus is coming to town
+C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN
+
+ffmpeg -i "Path\input.format" -vn -c:a flac -map 0:0 -map_metadata -1 "Path\output.flac"
+ffmpeg -i "C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN\youtube.mkv" -vn -c:a flac -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN\d.flac"
+
+ffmpeg -i "C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN\b.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN\output 192.mp3"
+
+ffmpeg -i "C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN\b.flac" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN\output 6.ogg"
+
+
+ffmpeg -i "C:\Users\conde\Desktop\SANTA CLAUS IS COMING TO TOWN\output 192.mp3" -filter:a volumedetect -f null /dev/null
+0.0
+-13.5
+
+-------------------
+tarrasky A
+
+ffmpeg -i "C:\Users\conde\Videos\Christmas Waifu[1].mkv" -vn -c:a flac -map 0:0 -map_metadata -1 "C:\Users\conde\Videos\awa.flac"
+
+ffmpeg -i "C:\Users\conde\Videos\awa.flac" -vn -c:a libmp3lame -ar 44100 -ac 2 -b:a 192k -joint_stereo 0 -map 0:0 -map_metadata -1 "C:\Users\conde\Videos\output 192.mp3"
+
+ffmpeg -i "C:\Users\conde\Videos\awa.flac" -vn -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "C:\Users\conde\Videos\output 6.ogg"
+
+
+ffmpeg -i "C:\Users\conde\Videos\output 192.mp3" -filter:a volumedetect -f null /dev/null
+-15.3
+
+75% vol medio
+
+ffmpeg -i "C:\Users\conde\Videos\Christmas Waifu[1].mkv" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -maxrate 1333k -bufsize 2666k -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Videos\output 23 1333 2666.flv"
+
+
+ffmpeg -i "awa" -c:v copy -tune zerolatency -c:a copy -f mkv "http://25.4.94.97:8080"
+
+
+cd "C:\Users\conde\AppData\Local\osu!\Songs\beatmap-637410489116740902-output 192"
+FOR /F "tokens=*" %G IN ('dir /b *.wav') DO C:\Users\conde\Desktop\MAPPING\ffmpeg-4.1.3-win64-static\bin\ffmpeg -i "%G" -c:a libvorbis -q 6 -ac 2 -ar 44100 -map 0:0 -map_metadata -1 "%~nG.ogg"
+------------------------------------------------------------------------------------------------------------------------------
+ffmpeg -i input -c:v libx265 -crf 26 -preset fast -c:a aac -b:a 128k output.mp4
+
+
+ffmpeg -i "D:\aaaaaaaaaaaaaaaaBACK DO BACK UP\huge media\[Kirion] Seishun Buta Yarou wa Bunny Girl Senpai no Yume o Minai\OP-ED\[Kirion] AoButa - NCED - 01 (BD 1280x720 x264 QAAC).mp4" -c:v copy -tune zerolatency -c:a copy -f mkv "http://25.4.94.97:8080"
+D:\>ffmpeg -i "D:\aaaaaaaaaaaaaaaaBACK DO BACK UP\huge media\[Kirion] Seishun Buta Yarou wa Bunny Girl Senpai no Yume o Minai\OP-ED\[Kirion] AoButa - NCED - 01 (BD 1280x720 x264 QAAC).mp4" -tune zerolatency -f mkv "udp://25.4.94.97:8080"
+
+ffmpeg -i "" -an -c:v libx264 -s 1280x720 -r 23.976 -preset veryslow -crf 23 -maxrate 1333k -bufsize 2666k -profile:v high -pix_fmt yuv420p -map 0:0 -map_metadata -1 "C:\Users\conde\Videos\output 23 1333 2666.flv"
+
+ffmpeg -i "" -c:v libx265 -s 1920x1080 -r 23.976 -crf 28 -preset fast -pix_fmt yuv420p -c:a libopus -b:a 320k "output.mkv"
+
+ffmpeg -i "C:\Users\anonimo\Downloads\[DragsterPS] Princess Mononoke [1080p] [Multi-Audio] [Multi-Subs] [B76ACD5D].mkv" -map 0:0 -c:v libx265 -s 1920x1080 -r 23.976 -crf 28 -preset faster -pix_fmt yuv420p -map 0:24 -c:a libopus -b:a 256k -af "channelmap=channel_layout=5.1" -map 0:39 -map 0:40 -map 0:25 -map 0:26 -c:s copy -threads 4 -speed 1 "output?.mkv"
+
+
+
+
+
+
+C:\Users\anonimo\Downloads\[Deadmau- RAWS] Sakurasou.no.Pet.na.Kanojo.S01.BDRip.720p.10bit.Ver.RUS.ENG.JAP.Deadmauvlad\[Deadmau- RAWS] Sakurasou.no.Pet.na.Kanojo.S01.BDRip.720p.10bit.Ver.RUS.ENG.JAP.Deadmauvlad.Ep.01.mkv
+ffmpeg -re -i "C:\Users\anonimo\Downloads\[Deadmau- RAWS] Sakurasou.no.Pet.na.Kanojo.S01.BDRip.720p.10bit.Ver.RUS.ENG.JAP.Deadmauvlad\[Deadmau- RAWS] Sakurasou.no.Pet.na.Kanojo.S01.BDRip.720p.10bit.Ver.RUS.ENG.JAP.Deadmauvlad.Ep.01.mkv" -c:v copy -c:a copy -f mpegts "tcp://192.168.0.20:8080/"
+
+
+
+
+
+ffmpeg -f dshow -framerate 20 -i video=screen-capture-recorder -vf scale=1280:720 -vcodec libx264 -pix_fmt yuv420p -tune zerolatency -preset ultrafast -f mpegts udp://192.168.0.20:8080/
+ffprobe -i "C:\Users\anonimo\Downloads\[Deadmau- RAWS] Sakurasou.no.Pet.na.Kanojo.S01.BDRip.720p.10bit.Ver.RUS.ENG.JAP.Deadmauvlad\[Deadmau- RAWS] Sakurasou.no.Pet.na.Kanojo.S01.BDRip.720p.10bit.Ver.RUS.ENG.JAP.Deadmauvlad.Ep.01.mkv"
+
+-map 0:0 -c:v copy -pix_fmt yuv420p -tune zerolatency -preset ultrafast -map 0:6 -c:a copy -f flv "http://192.168.0.20:8080/"
+
+@echo off
+SET /P AMENO=
+ffmpeg -re -i %AMENO% -vf "subtitles=%AMENO%:stream_index=3" -map 0:0 -c:v libx264 -pix_fmt yuv420p -tune zerolatency -preset ultrafast -map 0:6 -c:a libmp3lame -b:a 128k -threads 4 -speed 1 -f mpegts "udp://192.168.0.20:8080?pkt_size=1316"
+
+ffmpeg -re -i "" -vcodec libx264 -pix_fmt yuv420p -tune zerolatency -preset ultrafast -map_metadata -1 -f mpegts "udp://192.168.0.20:8080/"
+
+---------------------
+Referencias / material mais detalhado não relacionado ao osu!
+---------------------
+ffmpeg - documentação oficial, o que todos os comandos fazem -> https://ffmpeg.org/ffmpeg.html
+ffmpeg - tutorial oficial do proprio ffmpeg -> https://trac.ffmpeg.org/wiki/Encode/H.264
+ffmpeg - tutorials não relacionados ao osu! -> https://gist.github.com/protrolium/e0dbd4bb0f1a396fcb55
+ffmpeg - porque se usar crf e quais são os outros modos de controle de qualidade e bitrate "Understanding Rate Control Modes (x264, x265, vpx)" -> https://slhck.info/video/2017/03/01/rate-control.html
+---------------------
