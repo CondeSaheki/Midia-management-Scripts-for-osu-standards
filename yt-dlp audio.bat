@@ -3,5 +3,5 @@ setlocal
 
 ECHO Insira o link:
 SET /P link=
-youtube-dl.exe %link% --no-playlist -f bestaudio 
+yt-dlp.exe %link% --no-playlist -f bestaudio 
 PAUSE
