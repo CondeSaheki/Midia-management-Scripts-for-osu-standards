@@ -12,11 +12,11 @@ Download the ffmpeg and yt-dlp and this repo them place both in the same folder.
 - https://github.com/yt-dlp/yt-dlp/releases
 
 ## Tutorial
+### yt-dlp
++ Just open the desired script
 ### Encode
 1. Place the file in the same folder
 2. Drag and drop the file in the script
-### yt-dlp
-+ Just open the desired script
 
 For video encodding is recomended to use high quality video source and use this calculator to ensure the maximun allowed folder size.
 + Bitrate calculator https://www.dr-lex.be/info-stuff/videocalc.html
