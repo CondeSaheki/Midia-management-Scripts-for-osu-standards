@@ -5,11 +5,11 @@
 - Encoding video in osu standards with high quality
 
 Using FFmpeg and yt-dlp
-- https://ffmpeg.org/download.html
-- https://github.com/yt-dlp/yt-dlp/releases
 
 ## Setup
-Download the dependencies and this repo them place both in the scripts folder, ffmpeg.exe and yt-dlp.exe
+Download the ffmpeg and yt-dlp and this repo them place both in the scripts folder.
+- https://ffmpeg.org/download.html
+- https://github.com/yt-dlp/yt-dlp/releases
 
 ## Tutorial
 ### Encode
@@ -20,5 +20,6 @@ Download the dependencies and this repo them place both in the scripts folder, f
 
 For video encodding is recomended to use high quality video source and use this calculator to ensure the maximun allowed folder size.
 + Bitrate calculator https://www.dr-lex.be/info-stuff/videocalc.html
+
 The folder size must be:
 5mb + 10mb/min with max of 100mb
