@@ -1,9 +1,6 @@
 @ECHO off
 setlocal
-ECHO %*
 SET "name=%~dpn1"
-ECHO "%name%"
-pause
 ffmpeg -i %* -filter:a volumedetect -f null /dev/null
 ECHO Insira inverso do maxvolume:
 SET /P volume=
