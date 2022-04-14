@@ -13,10 +13,10 @@
 Download the dependencies and this repo them place both in the scripts folder, ffmpeg.exe and yt-dlp.exe
 
 # Tutorial
-1. Encode
-+ Place the file in the same folder
-+ Drag and drop the file in the script
-2. yt-dlp
+## Encode
+1. Place the file in the same folder
+2. Drag and drop the file in the script
+## yt-dlp
 + Just open the desired script
 
 For video encodding is recomended to use high quality video source and use this calculator to ensure the maximun allowed folder size
