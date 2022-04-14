@@ -4,7 +4,7 @@
 - Encoding audio in osu standards
 - Encoding video in osu standards with high quality
 
-Using FFmpeg and yt-dlp
+Using **FFmpeg** and **yt-dlp**
 
 ## Setup
 Download the ffmpeg and yt-dlp and this repo them place both in the same folder.
