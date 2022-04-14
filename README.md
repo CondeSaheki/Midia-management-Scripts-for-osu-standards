@@ -1,10 +1,10 @@
 # Scripts for midia management in osu standards
 
-**These script help:**
+**These script help**
 - High quality auio files from media services
 - Encoding audio in osu standards
 - Encoding video in high quality
 
-# dependencies
+# Dependencies
 https://ffmpeg.org/download.html
 https://github.com/yt-dlp/yt-dlp/releases
