@@ -7,7 +7,7 @@
 Using FFmpeg and yt-dlp
 
 ## Setup
-Download the ffmpeg and yt-dlp and this repo them place both in the scripts folder.
+Download the ffmpeg and yt-dlp and this repo them place both in the same folder.
 - https://ffmpeg.org/download.html
 - https://github.com/yt-dlp/yt-dlp/releases
 
