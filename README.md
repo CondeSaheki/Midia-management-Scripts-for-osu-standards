@@ -1,6 +1,9 @@
-# scripts-osu-maping
+# Scripts for midia management in osu standards
 
-These script help you getting high quality mp3 
+**These script help:**
+-High quality auio files from media services
+-Encoding audio in osu standards
+-Encoding video in high quality
 
 # dependencies
 https://ffmpeg.org/download.html
