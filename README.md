@@ -1,4 +1,4 @@
-# Scripts for midia management in osu standards
+# Scripts for midia management in osu! standards
 
 **These script help**
 - High quality audio files from media services
