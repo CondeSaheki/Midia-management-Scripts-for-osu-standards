@@ -6,5 +6,5 @@
 - Encoding video in high quality
 
 # Dependencies
-https://ffmpeg.org/download.html
-https://github.com/yt-dlp/yt-dlp/releases
+- https://ffmpeg.org/download.html
+- https://github.com/yt-dlp/yt-dlp/releases
