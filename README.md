@@ -10,6 +10,7 @@ Using **FFmpeg** and **yt-dlp**
 Download the ffmpeg and yt-dlp and this repo them place both in the same folder.
 - https://ffmpeg.org/download.html
 - https://github.com/yt-dlp/yt-dlp/releases
+Note that we need both executables directly in the folder and not a folder containing it
 
 ## Tutorial
 ### yt-dlp
